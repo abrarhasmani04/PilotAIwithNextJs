@@ -1,11 +1,27 @@
 "use client";
 
 import React, { useState } from "react";
+import { useEffect } from "react";
+
 
 const InterviewForm = () => {
   const [role, setRole] = useState("");
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
+  const [history,setHistory]=useState([])
+
+  const getHistory = async () => {
+    const res = await fetch("/api/interview/history");
+    const data = await res.json();
+  
+    setHistory(data);
+  };
+
+  
+
+useEffect(() => {
+  getHistory();
+}, []);
 
   const generateQuestions = async () => {
     if (!role.trim()) return;
@@ -23,6 +39,7 @@ const InterviewForm = () => {
 
       const data = await res.json();
       setResult(data.response);
+      await getHistory()
     } catch (error) {
       console.error(error);
       setResult("Something went wrong. Please try again.");
@@ -86,6 +103,27 @@ const InterviewForm = () => {
               </pre>
             </div>
           )}
+
+<div className="mt-10">
+  <h2 className="text-2xl font-bold mb-4">
+    Previous Interviews
+  </h2>
+
+  <div className="space-y-4">
+    {history.map((item: any) => (
+      <div
+        key={item._id}
+        className="bg-white/5 border border-white/10 rounded-2xl p-5"
+      >
+        <h3 className="font-semibold text-purple-400">
+          {item.role}
+        </h3>
+
+       
+      </div>
+    ))}
+  </div>
+</div>
         </div>
       </div>
     </section>
